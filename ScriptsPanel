@@ -1,0 +1,79 @@
+
+local Rayfield = loadstring(game:HttpGet(
+    "https://sirius.menu/rayfield"
+))()
+
+local Window = Rayfield:CreateWindow({
+    Name = "My Game Hub",
+    LoadingTitle = "My Game",
+    LoadingSubtitle = "Custom Script",
+    ConfigurationSaving = {
+        Enabled = false
+    }
+})
+
+local Main = Window:CreateTab("Main", 4483362458)
+local Defusal = Window:CreateTab("Defusal", 4483362458)
+
+-- MAIN
+local DoubleJumpEnabled = false
+
+Main:CreateToggle({
+    Name = "Double Jump",
+    CurrentValue = false,
+    Callback = function(Value)
+        DoubleJumpEnabled = Value
+    end
+})
+
+-- DEFUSAL
+local XRayEnabled = false
+local Highlights = {}
+
+local function RemoveHighlights()
+    for _, Highlight in pairs(Highlights) do
+        Highlight:Destroy()
+    end
+    table.clear(Highlights)
+end
+
+local function AddHighlight(Player)
+    if Player == game.Players.LocalPlayer then
+        return
+    end
+
+    local Character = Player.Character
+    if not Character then return end
+
+    if Highlights[Player] then
+        Highlights[Player]:Destroy()
+    end
+
+    local Highlight = Instance.new("Highlight")
+    Highlight.Name = "XRayHighlight"
+    Highlight.Adornee = Character
+    Highlight.FillColor = Color3.fromRGB(255, 255, 0)
+    Highlight.OutlineColor = Color3.fromRGB(255, 255, 0)
+    Highlight.FillTransparency = 1
+    Highlight.OutlineTransparency = 0
+    Highlight.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop
+    Highlight.Parent = Character
+
+    Highlights[Player] = Highlight
+end
+
+Defusal:CreateToggle({
+    Name = "X Ray",
+    CurrentValue = false,
+    Callback = function(Value)
+        XRayEnabled = Value
+
+        if Value then
+            for _, Player in pairs(game.Players:GetPlayers()) do
+                AddHighlight(Player)
+            end
+        else
+            RemoveHighlights()
+        end
+    end
+})
